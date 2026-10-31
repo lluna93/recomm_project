@@ -105,33 +105,70 @@ recomm_project/
 | `GET /transformer/recommendations?user_id=1` | Transformer 추천 영화 조회 |
 
 Nginx를 통한 웹 접근 시 API 경로 앞에 `/api`가 붙습니다. 예: `/api/mf/kpi`.
-
 ## 🐳 Docker 실행 및 확인
 
-**주의:** PostgreSQL에는 기존 영화·평점·회원 데이터가 저장되어 있습니다. 배포 전 `docker-compose.yml`에서 `postgres_data`가 기존 외부 볼륨 `recomm_project_postgres_data`를 가리키는지 확인하세요. 체크포인트 파일도 삭제하거나 초기화하지 않습니다.
+### 1. 실행 환경
+
+- Docker Desktop
+- Docker Compose
+- NVIDIA GPU (GTX 1660, CUDA 학습 환경)
+- `.env` 환경변수 설정
+
+> SVD는 CPU, MF와 Transformer는 GPU(CUDA)를 이용해 학습했습니다. Docker에서 추천 API를 실행할 때는 별도의 GPU 설정이 없다면 CPU로 추론할 수 있습니다.
+
+### 2. 프로젝트 실행
+
+프로젝트 루트에서 실행합니다.
 
 ```powershell
-# 프로젝트 루트에서 실행
 cd D:\bej\recomm_project
 
-# 기존 DB 볼륨과 설정 확인
+# 기존 PostgreSQL 볼륨 확인
 docker volume inspect recomm_project_postgres_data
+
+# Docker Compose 설정 확인
 docker compose config --quiet
 
-# 기존 DB/Redis 컨테이너 유지하며 실행
-docker compose up -d --no-recreate postgres redis
+# 전체 서비스 빌드 및 실행
+docker compose up -d --build
 
-# 애플리케이션 빌드 및 재배포
-docker compose build backend nginx
-docker compose up -d --no-deps --force-recreate backend nginx
-
-# 상태 및 로그 확인
+# 실행 상태 확인
 docker compose ps
-docker compose logs --tail=100 backend
 ```
 
-`.env`에 설정한 `NGINX_PORT`로 접속합니다. 예를 들어 `NGINX_PORT=8080`이면 `http://localhost:8080`입니다.
+### 3. 서비스 접속
 
+`.env` 파일의 `NGINX_PORT` 값을 기준으로 접속합니다.
+
+예시: `NGINX_PORT=8080`
+
+- 웹 서비스: http://localhost:8080
+- API 문서: http://localhost:8080/api/docs
+
+### 4. 코드 수정 후 재배포
+
+프론트엔드와 백엔드 코드를 수정한 경우:
+
+```powershell
+docker compose up -d --build --no-deps backend nginx
+```
+
+백엔드 로그 확인:
+
+```powershell
+docker compose logs -f backend
+```
+
+### 5. 데이터 및 모델 보존
+
+PostgreSQL은 기존 외부 Docker 볼륨 `recomm_project_postgres_data`를 사용합니다.
+
+- PostgreSQL 데이터는 Docker 볼륨에 유지됩니다.
+- 학습된 모델은 `backend/checkpoint/`에 보관합니다.
+- 모델 체크포인트는 GitHub 저장소에도 포함합니다.
+- `docker compose down -v`, `docker volume prune` 등 데이터 볼륨 삭제 명령은 사용하지 않습니다.
+
+> **주의:** Docker Compose 설정에서 `postgres_data`가 기존 외부 볼륨을 참조하는지 확인한 후 실행하세요. 기존 데이터가 저장된 볼륨을 삭제하거나 다른 빈 볼륨으로 교체하지 않습니다.
 > **데이터 보존:** `docker compose down -v`, `docker volume prune` 등 볼륨을 삭제하는 명령은 사용하지 않습니다. PostgreSQL 볼륨은 Git에 포함되지 않습니다. 모델 체크포인트는 Git에 포함하되 별도 백업도 권장합니다.
 
 ## 🎯 프로젝트 목적
