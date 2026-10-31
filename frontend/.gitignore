@@ -1,0 +1,141 @@
+
+# ==================================================
+# Recomm Project - Git Ignore
+# React + FastAPI + PostgreSQL + Redis + PyTorch
+# ==================================================
+
+
+# --------------------------------------------------
+# 1. Environment / Secrets
+# --------------------------------------------------
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+
+
+# --------------------------------------------------
+# 2. Python / FastAPI
+# --------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+*.egg-info/
+build/
+
+
+# --------------------------------------------------
+# 3. Node.js / React / Vite
+# --------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+
+*.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+.npm/
+.cache/
+.vite/
+
+
+# --------------------------------------------------
+# 4. Model Checkpoints
+# SVD / MF / Transformer 모델 Git 관리
+# --------------------------------------------------
+
+# 학습된 모델은 Git에 포함
+# backend/checkpoint/svd_model.joblib
+# backend/checkpoint/mf.pt
+# backend/checkpoint/transformer.pt
+
+# 임시 체크포인트만 제외
+*.pt.tmp
+*.ckpt.tmp
+
+# --------------------------------------------------
+# 5. PostgreSQL / Redis
+# --------------------------------------------------
+pgdata/
+postgres_data/
+redis_data/
+
+*.dump
+*.backup
+*.sql.gz
+*.rdb
+appendonly.aof
+appendonlydir/
+
+
+# --------------------------------------------------
+# 6. Logs
+# --------------------------------------------------
+logs/
+*.log
+
+
+# --------------------------------------------------
+# 7. IDE / Editor
+# --------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# --------------------------------------------------
+# 8. Docker Local Files
+# --------------------------------------------------
+docker-compose.override.yml
+
+*.pid
+*.sock
+
+
+# --------------------------------------------------
+# 9. Temporary Files
+# --------------------------------------------------
+tmp/
+temp/
+
+*.tmp
+*.bak
+*.swp
+*.swo
+
+
+# --------------------------------------------------
+# 10. Jupyter / Streamlit
+# --------------------------------------------------
+.ipynb_checkpoints/
+.streamlit/secrets.toml
